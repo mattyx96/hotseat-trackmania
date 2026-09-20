@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { buildPayload, updateCloudSession } from '../lib/cloud';
 import { resolveTurn } from '../lib/track';
 import { loadData, saveData } from '../lib/storage';
-import type { AppData, Player, Session, TimeResult, Track } from '../types';
+import type { AppData, CloudPayload, Player, Session, TimeResult, Track } from '../types';
 import { AppContext, type AppContextValue } from './appContext';
 
 function uid(): string {
@@ -38,9 +39,43 @@ function consumeActiveTime(track: Track, now: number): Track {
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [data, setData] = useState<AppData>(() => loadData());
+  const lastSynced = useRef(new Map<string, string>());
+  const syncTimers = useRef(new Map<string, number>());
 
   useEffect(() => {
     saveData(data);
+  }, [data]);
+
+  // Auto-save any session that has been shared to the cloud (debounced).
+  useEffect(() => {
+    const timers = syncTimers.current;
+    for (const session of data.sessions) {
+      const code = session.shareCode;
+      if (!code) continue;
+
+      const snapshot = JSON.stringify(buildPayload(session, data.players));
+      if (lastSynced.current.get(code) === snapshot) continue;
+
+      const pending = timers.get(code);
+      if (pending !== undefined) window.clearTimeout(pending);
+
+      timers.set(
+        code,
+        window.setTimeout(() => {
+          timers.delete(code);
+          lastSynced.current.set(code, snapshot);
+          updateCloudSession(code, session, data.players).catch(() => {
+            // Allow a retry on the next change.
+            lastSynced.current.delete(code);
+          });
+        }, 1500),
+      );
+    }
+
+    return () => {
+      for (const timer of timers.values()) window.clearTimeout(timer);
+      timers.clear();
+    };
   }, [data]);
 
   const createSession = useCallback((name: string, playerNames: string[], turnDurationMs: number) => {
@@ -69,6 +104,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         playerIds,
         turnDurationMs: turnDurationMs > 0 ? turnDurationMs : 10 * 60 * 1000,
         tracks: [],
+        shareCode: null,
       };
 
       return {
@@ -127,6 +163,42 @@ export function AppProvider({ children }: { children: ReactNode }) {
           return session;
         }),
       };
+    });
+  }, []);
+
+  const attachShareCode = useCallback((sessionId: string, code: string) => {
+    setData((prev) => {
+      const target = prev.sessions.find((session) => session.id === sessionId);
+      if (target) {
+        lastSynced.current.set(code, JSON.stringify(buildPayload({ ...target, shareCode: code }, prev.players)));
+      }
+      return {
+        ...prev,
+        sessions: prev.sessions.map((session) =>
+          session.id === sessionId ? { ...session, shareCode: code } : session,
+        ),
+      };
+    });
+  }, []);
+
+  const importSession = useCallback((payload: CloudPayload, code: string | null) => {
+    setData((prev) => {
+      const players = [...prev.players];
+      for (const player of payload.players) {
+        if (!players.some((candidate) => candidate.id === player.id)) players.push(player);
+      }
+
+      const imported: Session = { ...payload.session, shareCode: code };
+      if (code) {
+        lastSynced.current.set(code, JSON.stringify(buildPayload(imported, players)));
+      }
+
+      const exists = prev.sessions.some((session) => session.id === imported.id);
+      const sessions = exists
+        ? prev.sessions.map((session) => (session.id === imported.id ? imported : session))
+        : [imported, ...prev.sessions];
+
+      return { ...prev, players, sessions };
     });
   }, []);
 
@@ -353,6 +425,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     endSession,
     deleteSession,
     reopenSession,
+    importSession,
+    attachShareCode,
     addTrack,
     selectTrack,
     startTimer,

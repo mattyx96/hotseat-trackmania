@@ -45,6 +45,14 @@ export interface Session {
   /** Default time budget per player, per track (e.g. 10 minutes). */
   turnDurationMs: number;
   tracks: Track[];
+  /** Short code of the cloud copy, when this session has been shared. */
+  shareCode: string | null;
+}
+
+/** A session plus the players it references — what gets stored in the cloud. */
+export interface CloudPayload {
+  session: Session;
+  players: Player[];
 }
 
 export interface AppData {

@@ -75,6 +75,7 @@ function normalizeSession(raw: unknown): Session | null {
     endedAt: typeof value.endedAt === 'string' ? value.endedAt : null,
     playerIds,
     turnDurationMs,
+    shareCode: typeof value.shareCode === 'string' ? value.shareCode : null,
     tracks: Array.isArray(value.tracks) ? value.tracks.map((track) => normalizeTrack(track, playerIds)) : [],
   };
 }

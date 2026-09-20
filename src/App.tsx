@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Button, Text, ThemeProvider, ToastProvider, useTheme } from 'nebula-ds-react-library';
+import { Button, Text, ThemeProvider, ToastProvider, useTheme, useToast } from 'nebula-ds-react-library';
 import { MoonIcon, SunIcon } from '@heroicons/react/24/solid';
 import gridUrl from './assets/grid.svg';
+import { extractCode, fetchCloudSession, isShareCode } from './lib/cloud';
 import { AppProvider } from './state/AppProvider';
 import { useApp } from './state/appContext';
 import { SetupScreen } from './components/SetupScreen';
@@ -20,14 +21,45 @@ const TABS: { id: Tab; label: string }[] = [
 ];
 
 function AppShell() {
-  const { activeSession, reopenSession } = useApp();
+  const { activeSession, reopenSession, importSession } = useApp();
   const { theme, setTheme } = useTheme();
+  const toast = useToast();
   const [tab, setTab] = useState<Tab>('play');
 
   // Keep portals (dialog, select menu, toasts) in sync with the active theme.
   useEffect(() => {
     document.documentElement.dataset.nbTheme = theme;
   }, [theme]);
+
+  // Deep link: /?session=<code> loads a shared session once, then cleans the URL.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const raw = params.get('session');
+    if (!raw) return;
+
+    params.delete('session');
+    const query = params.toString();
+    window.history.replaceState({}, '', `${window.location.pathname}${query ? `?${query}` : ''}`);
+
+    const code = extractCode(raw);
+    if (!code || !isShareCode(code)) {
+      toast.error({ title: 'Invalid share link' });
+      return;
+    }
+
+    void (async () => {
+      try {
+        const { payload, code: resolved } = await fetchCloudSession(code);
+        importSession(payload, resolved);
+        toast.success({ title: 'Session loaded', description: payload.session.name });
+      } catch (error) {
+        toast.error({
+          title: 'Could not load the session',
+          description: error instanceof Error ? error.message : undefined,
+        });
+      }
+    })();
+  }, [importSession, toast]);
 
   const openSession = (sessionId: string) => {
     reopenSession(sessionId);

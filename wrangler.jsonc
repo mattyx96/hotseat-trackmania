@@ -1,0 +1,12 @@
+{
+  "name": "hotseat-trackmania",
+  "pages_build_output_dir": "dist",
+  "compatibility_date": "2026-09-20",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "hotseat",
+      "database_id": "a0a7c71f-1023-429d-afd6-38e72c6a710c"
+    }
+  ]
+}

@@ -7,6 +7,7 @@ import { activePlayer, liveRemaining, recordHolderId } from '../lib/track';
 import { useApp } from '../state/appContext';
 import { Card } from './Card';
 import { RecordTimeDialog } from './RecordTimeDialog';
+import { ShareSessionDialog } from './ShareSessionDialog';
 import { Timer } from './Timer';
 import type { Player, Track } from '../types';
 
@@ -147,14 +148,17 @@ export function SessionView() {
           activeSession.turnDurationMs,
         )} per turn`}
         actions={
-          <Button
-            variant="outlined"
-            size="S"
-            rounded="R"
-            leftIcon={<StopCircleIcon />}
-            text="End session"
-            onClick={endSession}
-          />
+          <div className="hs-row hs-row--end">
+            <ShareSessionDialog session={activeSession} />
+            <Button
+              variant="outlined"
+              size="S"
+              rounded="R"
+              leftIcon={<StopCircleIcon />}
+              text="End session"
+              onClick={endSession}
+            />
+          </div>
         }
       >
         <div className="hs-chips">

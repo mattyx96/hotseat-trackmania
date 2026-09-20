@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import type { AppData, Player, Session, Track } from '../types';
+import type { AppData, CloudPayload, Player, Session, Track } from '../types';
 
 export interface AppContextValue {
   data: AppData;
@@ -12,6 +12,10 @@ export interface AppContextValue {
   deleteSession: (sessionId: string) => void;
   /** Make an ended session live again (ending any other active session). */
   reopenSession: (sessionId: string) => void;
+  /** Import a cloud session (and its players) locally; the cloud copy wins. */
+  importSession: (payload: CloudPayload, code: string | null) => void;
+  /** Remember the share code assigned to a session (enables auto-save). */
+  attachShareCode: (sessionId: string, code: string) => void;
   addTrack: (name: string) => void;
   selectTrack: (trackId: string) => void;
   startTimer: (trackId: string) => void;

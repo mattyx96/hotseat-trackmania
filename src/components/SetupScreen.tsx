@@ -1,6 +1,7 @@
 import { useState, type KeyboardEvent, type ReactNode } from 'react';
-import { Input, Button, IconButton, Text } from 'nebula-ds-react-library';
+import { Input, Button, IconButton, Text, useToast } from 'nebula-ds-react-library';
 import {
+  ArrowDownTrayIcon,
   ArrowUturnLeftIcon,
   ClockIcon,
   FlagIcon,
@@ -11,6 +12,7 @@ import {
   UserGroupIcon,
   XMarkIcon,
 } from '@heroicons/react/24/solid';
+import { extractCode, fetchCloudSession, isShareCode } from '../lib/cloud';
 import { formatClock } from '../lib/time';
 import { useApp } from '../state/appContext';
 import { Card } from './Card';
@@ -34,13 +36,16 @@ function Stat({ icon, value, label }: { icon: ReactNode; value: string; label: s
 }
 
 export function SetupScreen() {
-  const { data, createSession, reopenSession } = useApp();
+  const { data, createSession, reopenSession, importSession } = useApp();
   const { players, sessions } = data;
+  const toast = useToast();
 
   const [sessionName, setSessionName] = useState('');
   const [turnMinutes, setTurnMinutes] = useState('10');
   const [draft, setDraft] = useState('');
   const [participants, setParticipants] = useState<string[]>([]);
+  const [loadValue, setLoadValue] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const minutes = Number(turnMinutes);
   const turnValid = Number.isFinite(minutes) && minutes > 0;
@@ -75,6 +80,28 @@ export function SetupScreen() {
   const start = () => {
     if (!canStart) return;
     createSession(sessionName, participants, turnMs);
+  };
+
+  const loadSession = async () => {
+    const code = extractCode(loadValue);
+    if (!code || !isShareCode(code)) {
+      toast.error({ title: 'Enter a valid share code' });
+      return;
+    }
+    setLoading(true);
+    try {
+      const { payload, code: resolved } = await fetchCloudSession(code);
+      importSession(payload, resolved);
+      setLoadValue('');
+      toast.success({ title: 'Session loaded', description: payload.session.name });
+    } catch (error) {
+      toast.error({
+        title: 'Could not load the session',
+        description: error instanceof Error ? error.message : undefined,
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const knownPlayers = players.filter(
@@ -225,6 +252,34 @@ export function SetupScreen() {
           </Card>
         </div>
       </div>
+
+      <Card title="Load a shared session" subtitle="Paste a share code or link from another player.">
+        <div className="hs-row">
+          <Input
+            label="Share code or link"
+            placeholder="ABC234XY or https://…/?session=ABC234XY"
+            value={loadValue}
+            onChange={(event) => setLoadValue(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                event.preventDefault();
+                void loadSession();
+              }
+            }}
+            fullWidth
+            className="hs-grow"
+          />
+          <Button
+            variant="filled"
+            size="M"
+            rounded="R"
+            leftIcon={<ArrowDownTrayIcon />}
+            text="Load"
+            disabled={loading}
+            onClick={() => void loadSession()}
+          />
+        </div>
+      </Card>
 
       {recent.length > 0 && (
         <Card title="Recent sessions" subtitle="Pick up where you left off.">
