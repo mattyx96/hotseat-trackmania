@@ -54,8 +54,8 @@ body {
   gap: var(--nb-4);
   flex-wrap: wrap;
   padding: var(--nb-4) var(--nb-6);
-  background: var(--nb-background-secondary-default);
-  border-bottom: var(--nb-border-1) solid var(--nb-paper-border-light);
+  background: var(--nb-background-primary);
+  border-bottom: var(--nb-border-0-5) solid var(--nb-background-accent-200);
 }
 
 .hs-brand {
