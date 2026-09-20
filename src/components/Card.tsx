@@ -12,7 +12,7 @@ interface CardProps {
 /** Nebula `Paper` with a consistent title/subtitle + actions header row. */
 export function Card({ title, subtitle, actions, outline = '200', children }: CardProps) {
   return (
-    <Paper round="no" outline={outline} panelClassName="hs-panel">
+    <Paper round="no" outline={outline}>
       <div className="hs-cardhead">
         <div className="hs-titleblock">
           <Text component="h6" variant="header6">

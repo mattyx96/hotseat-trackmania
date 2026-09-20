@@ -39,15 +39,8 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: var(--nb-background-secondary-default);
+  background-color: var(--nb-background-primary);
   color: var(--nb-background-contrast-primary-500);
-}
-
-/* Our surfaces use `background-secondary-default`, which equals the outlined
-   input border token (`background-accent-500`) in dark mode. Use the lighter
-   accent so the resting input outline stays visible (error/focus unaffected). */
-:where([data-nb-theme='dark']) .nb-input--outlined:not(.nb-input--invalid):not(:focus) {
-  border-color: var(--nb-background-accent-200);
 }
 
 /* ---------- Header ---------- */
@@ -191,11 +184,6 @@ body {
   justify-content: space-between;
   gap: var(--nb-4);
   flex-wrap: wrap;
-}
-
-/* Panels share the page/header surface for a flat, single-tone layout. */
-.hs-panel {
-  background-color: var(--nb-background-secondary-default);
 }
 
 .hs-cardhead__actions {
@@ -654,7 +642,7 @@ body {
   text-align: left;
   padding: var(--nb-3) var(--nb-4);
   background: var(--nb-frame-background-primary);
-  border: var(--nb-border-0-5) solid var(--nb-background-contrast-primary-200);
+  border: var(--nb-border-0-5) solid var(--nb-background-accent-200);
   border-radius: var(--nb-border-radius-50);
   color: inherit;
   font: inherit;
@@ -693,7 +681,7 @@ body {
   gap: var(--nb-3);
   padding: var(--nb-4) var(--nb-5);
   background: var(--nb-frame-background-primary);
-  border: var(--nb-border-0-5) solid var(--nb-background-contrast-primary-200);
+  border: var(--nb-border-0-5) solid var(--nb-background-accent-200);
   border-radius: var(--nb-border-radius-50);
 }
 
