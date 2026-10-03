@@ -19,7 +19,8 @@ _None yet._
 
 ## UI / UX
 
-_None yet._
+- **Proper logo.** The app is headed by a styled "HOTSEAT" wordmark; it should have a real logo
+  (asset/mark) instead, including a favicon and ideally a share/OG image.
 
 ## Other
 
