@@ -226,6 +226,7 @@ export function SessionView() {
               remainingMs={remaining}
               running={running}
               playerName={active ? resolveName(active.playerId) : '—'}
+              durationMs={activeTrack.durationMs}
               onStart={() => startTimer(activeTrack.id)}
               onStop={() => stopTimer(activeTrack.id)}
               onAdjust={(deltaMs) => adjustTimer(activeTrack.id, deltaMs)}

@@ -208,15 +208,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const session = prev.sessions.find((candidate) => candidate.id === prev.activeSessionId);
       if (!session) return prev;
 
-      const now = Date.now();
       const track: Track = {
         id,
         name: name.trim() || `Track ${session.tracks.length + 1}`,
-        createdAt: new Date(now).toISOString(),
+        createdAt: new Date().toISOString(),
         durationMs: session.turnDurationMs,
         players: session.playerIds.map((playerId) => ({ playerId, remainingMs: session.turnDurationMs })),
         activePlayerId: session.playerIds[0] ?? null,
-        timerStartedAt: session.playerIds.length > 0 ? new Date(now).toISOString() : null,
+        timerStartedAt: null,
         completedAt: null,
         results: [],
       };
@@ -258,13 +257,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
+  const pauseTimer = useCallback((trackId: string) => {
+    setData((prev) =>
+      updateTrack(prev, trackId, (track) => {
+        if (track.completedAt || !track.timerStartedAt) return track;
+        return consumeActiveTime(track, Date.now());
+      }),
+    );
+  }, []);
+
   const adjustTimer = useCallback((trackId: string, deltaMs: number) => {
     setData((prev) =>
       updateTrack(prev, trackId, (track) => {
         if (track.completedAt || !track.activePlayerId) return track;
         const players = track.players.map((player) =>
           player.playerId === track.activePlayerId
-            ? { ...player, remainingMs: Math.min(track.durationMs, Math.max(0, player.remainingMs + deltaMs)) }
+            ? { ...player, remainingMs: Math.max(0, player.remainingMs + deltaMs) }
             : player,
         );
         const updated: Track = { ...track, players };
@@ -328,7 +336,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         return {
           ...consumeActiveTime(track, now),
           activePlayerId: playerId,
-          timerStartedAt: new Date(now).toISOString(),
+          timerStartedAt: null,
         };
       }),
     );
@@ -431,6 +439,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     selectTrack,
     startTimer,
     stopTimer,
+    pauseTimer,
     adjustTimer,
     resetTimer,
     eliminateActivePlayer,

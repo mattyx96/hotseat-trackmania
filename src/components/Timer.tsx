@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react';
 import { PauseIcon, PlayIcon, ArrowPathIcon, ArrowRightIcon } from '@heroicons/react/24/solid';
+import type { ReactNode } from 'react';
 import { Button, Text } from 'nebula-ds-react-library';
 import { formatClock } from '../lib/time';
 
@@ -7,6 +7,8 @@ interface TimerProps {
   remainingMs: number;
   running: boolean;
   playerName: string;
+  /** The player's full turn budget, used to spot a nearly-finished countdown. */
+  durationMs: number;
   onStart: () => void;
   onStop: () => void;
   onAdjust: (deltaMs: number) => void;
@@ -25,6 +27,7 @@ export function Timer({
   remainingMs,
   running,
   playerName,
+  durationMs,
   onStart,
   onStop,
   onAdjust,
@@ -32,7 +35,14 @@ export function Timer({
   onPass,
   recordAction,
 }: TimerProps) {
-  const danger = remainingMs <= 60_000;
+  const low = remainingMs <= Math.min(60_000, durationMs * 0.15);
+  const valueClass = [
+    'hs-timer__value',
+    running ? 'hs-timer__value--running' : 'hs-timer__value--paused',
+    low ? 'hs-timer__value--low' : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <div className="hs-timer">
@@ -43,16 +53,12 @@ export function Timer({
         </Text>
       </div>
 
-      <Text
-        component="p"
-        variant="display2"
-        className={danger ? 'hs-timer__value hs-timer__value--danger' : 'hs-timer__value'}
-      >
+      <Text component="p" variant="display2" className={valueClass}>
         {formatClock(remainingMs)}
       </Text>
 
       <Text component="span" variant="body4" className="hs-muted">
-        Time left for {playerName}
+        {running ? `Time left for ${playerName}` : `Press Start when ${playerName} is ready`}
       </Text>
 
       <div className="hs-timer__controls">

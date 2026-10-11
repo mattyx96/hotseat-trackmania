@@ -9,6 +9,41 @@ export function formatTime(ms: number): string {
   return `${minutes}:${pad(seconds)}.${pad(millis, 3)}`;
 }
 
+/** Splits a lap time into minute / second / millisecond parts for editing. */
+export function splitTime(ms: number): { minutes: number; seconds: number; millis: number } {
+  const safe = Math.max(0, Math.round(ms));
+  return {
+    minutes: Math.floor(safe / 60_000),
+    seconds: Math.floor((safe % 60_000) / 1000),
+    millis: safe % 1000,
+  };
+}
+
+/** Formats a signed difference, e.g. `-1.356` / `+0.400`. */
+export function formatDelta(ms: number): string {
+  const rounded = Math.round(ms);
+  const sign = rounded > 0 ? '+' : rounded < 0 ? '-' : '';
+  const absolute = Math.abs(rounded);
+  const seconds = Math.floor(absolute / 1000);
+  const millis = absolute % 1000;
+  return `${sign}${seconds}.${pad(millis, 3)}`;
+}
+
+/** Keeps the most recent `length` digits from raw input (segmented time fields). */
+export function segmentDigits(raw: string, length: number): string {
+  return raw.replace(/\D/g, '').slice(-length);
+}
+
+/**
+ * Normalises a segment value on blur: clamps to `max`, pads to `length` digits,
+ * and falls back to zeros when empty. Minutes are left unpadded (`allowBare`).
+ */
+export function normalizeSegment(value: string, length: number, max: number, allowBare = false): string {
+  if (value === '') return allowBare ? '0' : '0'.repeat(length);
+  const clamped = Math.min(max, Math.max(0, Number(value) || 0));
+  return allowBare ? String(clamped) : String(clamped).padStart(length, '0');
+}
+
 /** Formats a countdown/clock as `MM:SS`, or `H:MM:SS` past an hour. */
 export function formatClock(ms: number): string {
   const totalSeconds = Math.max(0, Math.floor(ms / 1000));

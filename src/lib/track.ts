@@ -31,7 +31,8 @@ export function isTrackComplete(track: Track): boolean {
 /**
  * Decides what happens after the active player's turn ends (a new record or a timeout):
  * either finish the track or hand the joypad to the next player who still has time.
- * The winner is always the current record holder.
+ * The winner is always the current record holder. The clock stays stopped — the
+ * next player has to press Start themselves.
  */
 export function resolveTurn(track: Track, now: number): Track {
   if (track.completedAt) return track;
@@ -64,6 +65,6 @@ export function resolveTurn(track: Track, now: number): Track {
   return {
     ...track,
     activePlayerId: target.playerId,
-    timerStartedAt: target.playerId === track.activePlayerId ? track.timerStartedAt : new Date(now).toISOString(),
+    timerStartedAt: null,
   };
 }

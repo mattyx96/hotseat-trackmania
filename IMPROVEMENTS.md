@@ -4,10 +4,7 @@ A running backlog of improvements and ideas for Hotseat.
 
 ## Play / session
 
-- **Timer must not start on its own.** It should only run after the user presses play. Switching player (`Next player` / tap a player) and recording a new record should both **stop** the timer too — starting the next turn stays an explicit action.
-- **Make the running timer recognisable.** It should be obvious whether the clock is running or not (e.g. a green/red flash or colour change when started/stopped).
-- **Human-readable record time format.** The time input/display for records isn't immediately readable — make it clearer.
-- **Pre-fill the previous record in the new-record input.** When entering a new time, the current record should already be in the input as the starting point.
+_None yet._
 
 ## Standings & tracks
 
@@ -19,8 +16,16 @@ _None yet._
 
 ## UI / UX
 
-_None yet._
+- **Proper logo.** The app is headed by a styled "HOTSEAT" wordmark; it should have a real logo
+  (asset/mark) instead, including a favicon and ideally a share/OG image.
 
 ## Other
 
 _None yet._
+
+## Done
+
+- [x] Timer only runs on **Start**; switching player or recording a record stops it.
+- [x] Running vs stopped timer is obvious (accent + pulse when running, muted "Paused" when not).
+- [x] Human-readable record entry (segmented min / sec / ms with a live preview and delta).
+- [x] New-record input pre-filled with the current record.

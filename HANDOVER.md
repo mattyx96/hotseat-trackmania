@@ -14,11 +14,15 @@ per-track records and history.
 - **Stack:** React 19 + TypeScript + Vite 8, styled with the **Nebula design system**
   (`nebula-ds-react-library`), hosted on Cloudflare Pages with Pages Functions + D1.
 
+**Docs:** everything lives in [`docs/`](./docs) (architecture & decisions, game rules, data model,
+API, development, deployment). This file is the quick handover; `docs/` is the detail.
+
 ## How it works (product rules)
 
 - Setup: name the session, set the **turn time** (default 10 min), add players (identity persists
   across sessions), start.
-- A **track** gives every player their own countdown. The active player ("joypad") races.
+- A **track** gives every player their own countdown. The active player ("joypad") races. The clock
+  only runs after **Start**, and any hand-off (record, Next player, tap a player) leaves it stopped.
 - **Record time** logs the active player's run; only faster-than-record runs are stored. A new record
   passes the joypad to the next player.
 - **Next player** or tapping a player card hands over the joypad without a record.
@@ -84,8 +88,9 @@ wrangler.jsonc            Pages + D1 binding (DB -> hotseat)
 - Recent fixes: DS default surfaces restored (page/panels/header = `background-primary`), border and
   input-outline contrast, panel `round="no"` + `outline="200"`, players section restyle, per-player
   turns with pass/eliminate, session reopen, full-width setup action.
-- Open work lives in [`IMPROVEMENTS.md`](./IMPROVEMENTS.md) (e.g. timer shouldn't auto-start, clearer
-  running state, human-readable record input, pre-fill previous record).
+- Timer UX: the clock is **manual** (starts only on Start, stops on hand-off), the running/stopped
+  state is colour-coded, and record entry is segmented min/sec/ms pre-filled with the current record.
+- Open work lives in [`IMPROVEMENTS.md`](./IMPROVEMENTS.md) (e.g. a proper logo).
 - Also discussed but **not built**: Cloudflare **Hono on Workers + D1 + auth** (Access/OAuth) as a
   heavier alternative to the current authless Pages Functions; recommended path was Pages Functions +
   D1 (built) and Access if auth is ever needed.
