@@ -208,15 +208,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const session = prev.sessions.find((candidate) => candidate.id === prev.activeSessionId);
       if (!session) return prev;
 
-      const now = Date.now();
       const track: Track = {
         id,
         name: name.trim() || `Track ${session.tracks.length + 1}`,
-        createdAt: new Date(now).toISOString(),
+        createdAt: new Date().toISOString(),
         durationMs: session.turnDurationMs,
         players: session.playerIds.map((playerId) => ({ playerId, remainingMs: session.turnDurationMs })),
         activePlayerId: session.playerIds[0] ?? null,
-        timerStartedAt: session.playerIds.length > 0 ? new Date(now).toISOString() : null,
+        timerStartedAt: null,
         completedAt: null,
         results: [],
       };
@@ -328,7 +327,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         return {
           ...consumeActiveTime(track, now),
           activePlayerId: playerId,
-          timerStartedAt: new Date(now).toISOString(),
+          timerStartedAt: null,
         };
       }),
     );

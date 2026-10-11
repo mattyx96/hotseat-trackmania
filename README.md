@@ -28,12 +28,13 @@ The joypad passes around the room, so every player races in turn with their own 
 
 1. **Play → Setup** — name the session, set the **turn time** (default 10 minutes), add the players
    (known players are one tap away and keep their identity across sessions), then **Start session**.
-2. **Track** — name a track; it starts right away with the first player's countdown running.
-3. **Turns** — a player races until they **beat the record**. Enter the time with **Record time** and
-   the joypad passes to the next player, whose countdown starts. You can also pass at any time with
-   **Next player**, or tap a player in the strip to switch to them — no record needed. If a player's
-   countdown hits zero they're **out** and the joypad skips to the next player with time left.
-   Start/Stop, **±1s / ±5s** and **Reset turn** keep the clock honest.
+2. **Track** — name a track; the first player is up with the clock **stopped**, ready for **Start**.
+3. **Turns** — press **Start** to run the countdown. A player races until they **beat the record**;
+   enter the time with **Record time** (minutes / seconds / milliseconds, pre-filled with the current
+   record) and the joypad passes to the next player — the clock stays stopped until they press Start.
+   You can also pass at any time with **Next player**, or tap a player in the strip to switch to them
+   — no record needed. If a player's countdown hits zero they're **out** and the joypad skips to the
+   next player with time left. **±5s** and **Reset turn** keep the clock honest.
 4. **Winning a track** — the track ends when only the record holder has time left (or everyone is
    out): the **last player to hold the best time wins**. The record history shows every record as it
    was beaten, newest (current holder) first.

@@ -304,13 +304,34 @@ body {
   font-family: 'Orbitron', sans-serif;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.06em;
-  color: var(--nb-primary-500);
   font-size: clamp(40px, 8vw, 72px);
   line-height: 1.1;
+  transition: color 0.2s ease;
 }
 
-.hs-timer__value--danger {
+.hs-timer__value--running {
+  color: var(--nb-primary-500);
+}
+
+.hs-timer__value--paused {
+  color: var(--nb-background-contrast-primary-200);
+}
+
+.hs-timer__value--low {
   color: var(--nb-button-background-secondary);
+  animation: hs-flash 1s steps(2, start) infinite;
+}
+
+@keyframes hs-flash {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hs-timer__value--low {
+    animation: none;
+  }
 }
 
 .hs-timer__controls {
@@ -343,6 +364,83 @@ body {
   100% {
     box-shadow: 0 0 0 0 rgba(227, 90, 61, 0);
   }
+}
+
+/* ---------- Time entry (min / sec / ms) ---------- */
+
+.hs-time {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--nb-1);
+}
+
+.hs-time__part {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--nb-1);
+  flex: 1;
+}
+
+.hs-time__sep {
+  padding-bottom: var(--nb-5);
+  font-family: var(--nb-font-families-orbitron);
+  font-size: var(--nb-font-size-6);
+  color: var(--nb-input-label-text-color-secondary);
+}
+
+.hs-time__segment {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nb-1);
+  flex: 1;
+}
+
+.hs-time__segment input {
+  width: 100%;
+  padding: var(--nb-3) var(--nb-2);
+  text-align: center;
+  font-family: var(--nb-font-families-orbitron);
+  font-size: var(--nb-font-size-7);
+  font-variant-numeric: tabular-nums;
+  color: var(--nb-background-contrast-primary-500);
+  background: transparent;
+  border: var(--nb-border-1) solid var(--nb-background-accent-500);
+  border-radius: var(--nb-border-radius-50);
+}
+
+.hs-time__segment input:focus {
+  outline: 0;
+  border-color: var(--nb-primary-500);
+  box-shadow: 0 0 0 var(--nb-border-1) var(--nb-primary-500);
+}
+
+.hs-time__segment span {
+  text-align: center;
+  font-size: var(--nb-font-size-2);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--nb-input-label-text-color-secondary);
+}
+
+.hs-time__summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--nb-3);
+}
+
+.hs-time__preview {
+  color: var(--nb-primary-500);
+}
+
+.hs-time__delta {
+  font-family: var(--nb-font-families-roboto-mono);
+  font-size: var(--nb-font-size-3);
+  color: var(--nb-input-color-error);
+}
+
+.hs-time__delta--better {
+  color: var(--nb-primary-500);
 }
 
 /* ---------- Ranks & results ---------- */
