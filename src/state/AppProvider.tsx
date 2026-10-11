@@ -272,7 +272,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         if (track.completedAt || !track.activePlayerId) return track;
         const players = track.players.map((player) =>
           player.playerId === track.activePlayerId
-            ? { ...player, remainingMs: Math.min(track.durationMs, Math.max(0, player.remainingMs + deltaMs)) }
+            ? { ...player, remainingMs: Math.max(0, player.remainingMs + deltaMs) }
             : player,
         );
         const updated: Track = { ...track, players };
