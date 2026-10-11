@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { Button, Dialog, Text, useToast } from 'nebula-ds-react-library';
 import { TrophyIcon } from '@heroicons/react/24/solid';
 import { bestTime } from '../lib/scoring';
-import { formatDelta, formatTime, splitTime } from '../lib/time';
+import { formatDelta, formatTime, normalizeSegment, segmentDigits, splitTime } from '../lib/time';
 import { useApp } from '../state/appContext';
 import type { Track } from '../types';
 
@@ -17,7 +17,7 @@ const LENGTH: Record<Segment, number> = { minutes: 2, seconds: 2, millis: 3 };
 const MAX: Record<Segment, number> = { minutes: 99, seconds: 59, millis: 999 };
 
 export function RecordTimeDialog({ track, playerName }: RecordTimeDialogProps) {
-  const { recordTime } = useApp();
+  const { recordTime, pauseTimer } = useApp();
   const toast = useToast();
   const [open, setOpen] = useState(false);
   const [minutes, setMinutes] = useState('0');
@@ -33,9 +33,11 @@ export function RecordTimeDialog({ track, playerName }: RecordTimeDialogProps) {
   const tooSlow = best !== null && parsed >= best;
   const valid = parsed > 0 && !tooSlow;
 
-  // Pre-fill with the current record (or zero) each time the dialog opens.
+  // Pre-fill with the current record (or zero) and stop the clock each time the
+  // dialog opens — entering the time means the run is over.
   const handleOpenChange = (next: boolean) => {
     if (next) {
+      pauseTimer(track.id);
       const parts = splitTime(best ?? 0);
       setMinutes(String(parts.minutes));
       setSeconds(String(parts.seconds).padStart(2, '0'));
@@ -51,14 +53,19 @@ export function RecordTimeDialog({ track, playerName }: RecordTimeDialogProps) {
   };
 
   const handleChange = (segment: Segment, raw: string, next?: Segment) => {
-    const digits = raw.replace(/\D/g, '').slice(0, LENGTH[segment]);
+    // Keep the most recent digits so typing appends/replaces naturally.
+    const digits = segmentDigits(raw, LENGTH[segment]);
     setSegment(segment, digits);
-    if (next && digits.length >= LENGTH[segment]) refs[next].current?.focus();
+    // Defer the focus move so the blur handler sees the committed value
+    // (focusing synchronously would blur with stale state and re-pad it).
+    if (next && digits.length >= LENGTH[segment]) {
+      const target = refs[next].current;
+      requestAnimationFrame(() => target?.focus());
+    }
   };
 
   const handleBlur = (segment: Segment) => {
-    const value = Math.min(MAX[segment], Number(getSegment(segment)) || 0);
-    setSegment(segment, segment === 'minutes' ? String(value) : String(value).padStart(LENGTH[segment], '0'));
+    setSegment(segment, normalizeSegment(getSegment(segment), LENGTH[segment], MAX[segment], segment === 'minutes'));
   };
 
   function getSegment(segment: Segment): string {

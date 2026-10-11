@@ -29,6 +29,21 @@ export function formatDelta(ms: number): string {
   return `${sign}${seconds}.${pad(millis, 3)}`;
 }
 
+/** Keeps the most recent `length` digits from raw input (segmented time fields). */
+export function segmentDigits(raw: string, length: number): string {
+  return raw.replace(/\D/g, '').slice(-length);
+}
+
+/**
+ * Normalises a segment value on blur: clamps to `max`, pads to `length` digits,
+ * and falls back to zeros when empty. Minutes are left unpadded (`allowBare`).
+ */
+export function normalizeSegment(value: string, length: number, max: number, allowBare = false): string {
+  if (value === '') return allowBare ? '0' : '0'.repeat(length);
+  const clamped = Math.min(max, Math.max(0, Number(value) || 0));
+  return allowBare ? String(clamped) : String(clamped).padStart(length, '0');
+}
+
 /** Formats a countdown/clock as `MM:SS`, or `H:MM:SS` past an hour. */
 export function formatClock(ms: number): string {
   const totalSeconds = Math.max(0, Math.floor(ms / 1000));

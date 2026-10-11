@@ -257,6 +257,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
+  const pauseTimer = useCallback((trackId: string) => {
+    setData((prev) =>
+      updateTrack(prev, trackId, (track) => {
+        if (track.completedAt || !track.timerStartedAt) return track;
+        return consumeActiveTime(track, Date.now());
+      }),
+    );
+  }, []);
+
   const adjustTimer = useCallback((trackId: string, deltaMs: number) => {
     setData((prev) =>
       updateTrack(prev, trackId, (track) => {
@@ -430,6 +439,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     selectTrack,
     startTimer,
     stopTimer,
+    pauseTimer,
     adjustTimer,
     resetTimer,
     eliminateActivePlayer,

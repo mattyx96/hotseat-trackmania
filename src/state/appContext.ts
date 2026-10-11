@@ -20,6 +20,8 @@ export interface AppContextValue {
   selectTrack: (trackId: string) => void;
   startTimer: (trackId: string) => void;
   stopTimer: (trackId: string) => void;
+  /** Stop the clock without ending the turn (used when opening the record dialog). */
+  pauseTimer: (trackId: string) => void;
   adjustTimer: (trackId: string, deltaMs: number) => void;
   resetTimer: (trackId: string) => void;
   /** A player ran out of time: mark them out and pass the joypad. */
