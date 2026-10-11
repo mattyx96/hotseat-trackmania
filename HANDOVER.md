@@ -14,6 +14,9 @@ per-track records and history.
 - **Stack:** React 19 + TypeScript + Vite 8, styled with the **Nebula design system**
   (`nebula-ds-react-library`), hosted on Cloudflare Pages with Pages Functions + D1.
 
+**Docs:** everything lives in [`docs/`](./docs) (architecture & decisions, game rules, data model,
+API, development, deployment). This file is the quick handover; `docs/` is the detail.
+
 ## How it works (product rules)
 
 - Setup: name the session, set the **turn time** (default 10 min), add players (identity persists

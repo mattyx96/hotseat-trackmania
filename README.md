@@ -7,6 +7,17 @@ Built with React 19 + Vite and the [Nebula design system](https://nebula-ds-reac
 (`nebula-ds-react-library`). All state lives in the browser (`localStorage`), with JSON export/import and
 an optional **cloud save** (Cloudflare Pages Functions + D1) addressed by a short share code.
 
+## Documentation
+
+Full docs live in [`docs/`](./docs):
+
+- [Architecture & decisions](./docs/architecture.md)
+- [Game rules](./docs/game-rules.md)
+- [Data model](./docs/data-model.md)
+- [Cloud API](./docs/api.md)
+- [Development](./docs/development.md)
+- [Deployment](./docs/deployment.md)
+
 ## Scripts
 
 ```bash
@@ -62,6 +73,9 @@ API (`functions/`):
 
 First-time setup: `wrangler d1 create hotseat` (put the returned id in `wrangler.jsonc`), then
 `npm run db:migrate:remote`.
+
+See [`docs/api.md`](./docs/api.md) for the full API and [`docs/architecture.md`](./docs/architecture.md)
+for the why (local-first, no auth, document storage).
 
 ## Data model
 
